@@ -35,7 +35,7 @@ namespace SummitAPI
 
             //Console.WriteLine("TD: " + sample); // lfp, as well as power 
             try { sw.WriteLine(GetTimestamp(DateTime.Now) + ", BatteryLevel, " + status.BatteryLifeRemaining.ToString()); }
-            catch (Exception er) { Console.WriteLine("Exception: "); }
+            catch (Exception er) { Console.WriteLine("Exception: batteryLevel "+ er); }
 
         }
         static void Main(string[] args)
@@ -388,7 +388,7 @@ namespace SummitAPI
 
 
         //public static StreamWriter sw = new StreamWriter("C:\\Users\\Michael Naumann\\Documents\\SummitTextFile.txt");
-        public static StreamWriter sw = new StreamWriter("C:\\Users\\gaoqi\\Documents\\SummitTextFile_7_30_133pm.txt");
+        public static StreamWriter sw = new StreamWriter("C:\\Users\\gaoqi\\Documents\\SummitTextFile_8_03_0109pm.txt");
 
         #region Event Handlers
         /// <summary>
@@ -407,7 +407,7 @@ namespace SummitAPI
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(GetTimestamp(DateTime.Now) + ", TD, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: "); }
+                    catch (Exception er) { Console.WriteLine("Exception: TD"+ er); }
 
                 }
 
@@ -452,7 +452,7 @@ namespace SummitAPI
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(timeStamp + ", Power, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: "); }
+                    catch (Exception er) { Console.WriteLine("Exception: Power" + er); }
 
                 }
 
@@ -478,21 +478,21 @@ namespace SummitAPI
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(timeStamp + ", AccellX, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: "); }
+                    catch (Exception er) { Console.WriteLine("Exception: accellX"+er); }
 
                 }
                 foreach (var sample in e.YSamples)
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(timeStamp + ", AccellY, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: "); }
+                    catch (Exception er) { Console.WriteLine("Exception: accellY"+er); }
 
                 }
                 foreach (var sample in e.ZSamples)
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(timeStamp + ", AccellZ, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: "); }
+                    catch (Exception er) { Console.WriteLine("Exception: accellZ"+er); }
 
                 }
 
