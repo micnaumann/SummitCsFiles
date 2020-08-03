@@ -35,7 +35,7 @@ namespace SummitAPI
 
             //Console.WriteLine("TD: " + sample); // lfp, as well as power 
             try { sw.WriteLine(GetTimestamp(DateTime.Now) + ", BatteryLevel, " + status.BatteryLifeRemaining.ToString()); }
-            catch (Exception er) { Console.WriteLine("Exception: batteryLevel "+ er); }
+            catch (Exception er) { Console.WriteLine("Exception: batteryLevel " + er); }
 
         }
         static void Main(string[] args)
@@ -407,7 +407,7 @@ namespace SummitAPI
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(GetTimestamp(DateTime.Now) + ", TD, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: TD"+ er); }
+                    catch (Exception er) { Console.WriteLine("Exception: TD" + er); }
 
                 }
 
@@ -478,21 +478,21 @@ namespace SummitAPI
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(timeStamp + ", AccellX, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: accellX"+er); }
+                    catch (Exception er) { Console.WriteLine("Exception: accellX" + er); }
 
                 }
                 foreach (var sample in e.YSamples)
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(timeStamp + ", AccellY, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: accellY"+er); }
+                    catch (Exception er) { Console.WriteLine("Exception: accellY" + er); }
 
                 }
                 foreach (var sample in e.ZSamples)
                 {
                     //Console.WriteLine("TD: " + sample); // lfp, as well as power 
                     try { sw.WriteLine(timeStamp + ", AccellZ, " + sample); }
-                    catch (Exception er) { Console.WriteLine("Exception: accellZ"+er); }
+                    catch (Exception er) { Console.WriteLine("Exception: accellZ" + er); }
 
                 }
 
@@ -507,6 +507,6 @@ namespace SummitAPI
         }
         #endregion
 
-        
+
     }
 }
