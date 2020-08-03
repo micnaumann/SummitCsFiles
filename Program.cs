@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Collections.Generic;
 using Medtronic.NeuroStim.Olympus.DataTypes.DeviceManagement;
@@ -24,7 +24,7 @@ namespace SummitAPI
         private static SummitSystem theSummit;
 
         private static System.Timers.Timer aTimer;
-        
+
         private static void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             //Do the stuff you want to be done every hour;
@@ -64,7 +64,8 @@ namespace SummitAPI
                     Console.WriteLine("Write Sensing State Result: " + senseStateEnable.Descriptor);
 
                     // Start streaming LFP, FFT, and power (plus timestamp data).
-                    APIReturnInfo streamEnable = theSummit.WriteSensingEnableStreams(true, true, true, false, false, false, true, false);
+                    APIReturnInfo streamEnable = theSummit.WriteSensingEnableStreams(true, false, true, false, false, true, true, false);
+                    //APIReturnInfo streamEnable = theSummit.WriteSensingEnableStreams(true, true, true, false, false, false, true, false); // sample
                     Console.WriteLine("Enable stream Result: " + streamEnable.Descriptor);
 
                     Console.WriteLine("Attaching data handlers - press enter at any time to stop");
@@ -72,8 +73,9 @@ namespace SummitAPI
 
                     // Attach events for the incoming packets (obviously this can be done anytime after the summit system is initialized).
                     theSummit.DataReceivedTDHandler += TheSummit_DataReceivedTDHandler;
-                    theSummit.DataReceivedFFTHandler += TheSummit_DataReceivedFFTHandler;
+                    //theSummit.DataReceivedFFTHandler += TheSummit_DataReceivedFFTHandler;
                     theSummit.DataReceivedPowerHandler += TheSummit_DataReceivedPowerHandler;
+                    theSummit.DataReceivedAccelHandler += TheSummit_DataReceivedAccelHandler;
 
                     aTimer = new System.Timers.Timer(20 * 60 * 1000); //one hour in milliseconds
                     //aTimer = new System.Timers.Timer(1 * 1000); //one hour in milliseconds
@@ -302,7 +304,8 @@ namespace SummitAPI
 
             // ********************************** Set up time domain **********************************
             List<TimeDomainChannel> TimeDomainChannels = new List<TimeDomainChannel>(4);
-            TdSampleRates the_sample_rate = TdSampleRates.Sample1000Hz;
+            //TdSampleRates the_sample_rate = TdSampleRates.Sample1000Hz;
+            TdSampleRates the_sample_rate = TdSampleRates.Sample0250Hz;
 
             // Channel Specific configuration - 0
             TimeDomainChannels.Add(new TimeDomainChannel(
@@ -345,7 +348,7 @@ namespace SummitAPI
                 TdHpfs.Hpf0_85Hz));
 
             // ********************************** Set up the FFT **********************************
-            FftConfiguration fftChannel = new FftConfiguration(FftSizes.Size0256, 100, FftWindowAutoLoads.Hann100);
+            FftConfiguration fftChannel = new FftConfiguration(FftSizes.Size1024, 100, FftWindowAutoLoads.Hann100);
 
             // ********************************** Set up the Power channels **********************************
             List<PowerChannel> powerChannels = new List<PowerChannel>
@@ -363,7 +366,8 @@ namespace SummitAPI
             // ********************************** Set miscellaneous settings **********************************
             MiscellaneousSensing miscsettings = new MiscellaneousSensing
             {
-                StreamingRate = StreamingFrameRate.Frame50ms,
+                StreamingRate = StreamingFrameRate.Frame100ms,
+                //StreamingRate = StreamingFrameRate.Frame50ms,
                 LrTriggers = LoopRecordingTriggers.None,
                 LrPostBufferTime = 53,
                 Bridging = BridgingConfig.None
@@ -375,7 +379,8 @@ namespace SummitAPI
             returnBuffer &= theSummit.WriteSensingFftSettings(fftChannel).RejectCode == 0;
             returnBuffer &= theSummit.WriteSensingPowerChannels(theBandEnables, powerChannels).RejectCode == 0;
             returnBuffer &= theSummit.WriteSensingMiscSettings(miscsettings).RejectCode == 0;
-            returnBuffer &= theSummit.WriteSensingAccelSettings(AccelSampleRate.Disabled).RejectCode == 0;
+            returnBuffer &= theSummit.WriteSensingAccelSettings(AccelSampleRate.Sample32).RejectCode == 0;
+            //returnBuffer &= theSummit.WriteSensingAccelSettings(AccelSampleRate.Disabled).RejectCode == 0;
             Console.WriteLine("Writing sense configuration successful: " + returnBuffer.ToString());
 
             return returnBuffer;
@@ -384,7 +389,7 @@ namespace SummitAPI
 
         //public static StreamWriter sw = new StreamWriter("C:\\Users\\Michael Naumann\\Documents\\SummitTextFile.txt");
         public static StreamWriter sw = new StreamWriter("C:\\Users\\gaoqi\\Documents\\SummitTextFile_7_30_133pm.txt");
-        
+
         #region Event Handlers
         /// <summary>
         /// Time domain (LFP) event hander.
@@ -437,29 +442,71 @@ namespace SummitAPI
         /// <param name="e"></param>
         private static void TheSummit_DataReceivedPowerHandler(object sender, Medtronic.SummitAPI.Events.SensingEventPower e)
         {
-            // Console.WriteLine("POWER: " + e.Bands[0]);
-            // if (e.ChannelSamples.TryGetValue(0, out List<double> tdData)) // pulling Ch0 data // from TD copied
+            //Console.WriteLine("POWER: " + e.Bands[0]);
+            //if (e.ChannelSamples.TryGetValue(0, out List<double> tdData)) // pulling Ch0 data // from TD copied
 
-            //{
-            //    String timeStamp = GetTimestamp(DateTime.Now);
-            //    // sampling @ 1000Hz and frame rate @ 50ms ~= 50 samples per packet (sometimes get 48/49/51/52...).
-            //    foreach (var sample in e.Bands)
-            //    {
-            //        //Console.WriteLine("TD: " + sample); // lfp, as well as power 
-            //        try { sw.WriteLine(timeStamp + ", Power, " + sample); }
-            //        catch (Exception er) { Console.WriteLine("Exception: "); }
+            {
+                String timeStamp = GetTimestamp(DateTime.Now);
+                // sampling @ 1000Hz and frame rate @ 50ms ~= 50 samples per packet (sometimes get 48/49/51/52...).
+                foreach (var sample in e.Bands)
+                {
+                    //Console.WriteLine("TD: " + sample); // lfp, as well as power 
+                    try { sw.WriteLine(timeStamp + ", Power, " + sample); }
+                    catch (Exception er) { Console.WriteLine("Exception: "); }
 
-            //    }
+                }
 
-            //    // include time stamp
-            //    // instead save to a file. , instead of writing to console
-            //    // run for 24 hours. 9from clean boot, chekc other background programs)
-            //    // track enery consumptioin of the app, log and plot 
-            //    // create online repo, with code structure and data
-            //    // can add folder for interesting medical iot papers, (for talk on tuesday, and before meeting)
-            //}
+                // include time stamp
+                // instead save to a file. , instead of writing to console
+                // run for 24 hours. 9from clean boot, chekc other background programs)
+                // track enery consumptioin of the app, log and plot 
+                // create online repo, with code structure and data
+                // can add folder for interesting medical iot papers, (for talk on tuesday, and before meeting)
+            }
+
+        }
+
+        private static void TheSummit_DataReceivedAccelHandler(object sender, Medtronic.SummitAPI.Events.SensingEventAccel e)
+        {
+            //Console.WriteLine("Accel: " + e.XSamples.Count
+            //if (e.ChannelSamples.TryGetValue(0, out List<double> tdData)) // pulling Ch0 data // from TD copied
+
+            {
+                String timeStamp = GetTimestamp(DateTime.Now);
+                // sampling @ 1000Hz and frame rate @ 50ms ~= 50 samples per packet (sometimes get 48/49/51/52...).
+                foreach (var sample in e.XSamples)
+                {
+                    //Console.WriteLine("TD: " + sample); // lfp, as well as power 
+                    try { sw.WriteLine(timeStamp + ", AccellX, " + sample); }
+                    catch (Exception er) { Console.WriteLine("Exception: "); }
+
+                }
+                foreach (var sample in e.YSamples)
+                {
+                    //Console.WriteLine("TD: " + sample); // lfp, as well as power 
+                    try { sw.WriteLine(timeStamp + ", AccellY, " + sample); }
+                    catch (Exception er) { Console.WriteLine("Exception: "); }
+
+                }
+                foreach (var sample in e.ZSamples)
+                {
+                    //Console.WriteLine("TD: " + sample); // lfp, as well as power 
+                    try { sw.WriteLine(timeStamp + ", AccellZ, " + sample); }
+                    catch (Exception er) { Console.WriteLine("Exception: "); }
+
+                }
+
+                // include time stamp
+                // instead save to a file. , instead of writing to console
+                // run for 24 hours. 9from clean boot, chekc other background programs)
+                // track enery consumptioin of the app, log and plot 
+                // create online repo, with code structure and data
+                // can add folder for interesting medical iot papers, (for talk on tuesday, and before meeting)
+            }
 
         }
         #endregion
+
+        
     }
 }
